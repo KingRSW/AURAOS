@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=AURA Layout
+Exec=/usr/share/auraos/apply-layout.sh
+X-GNOME-Autostart-enabled=true
+Comment=Apply macOS-style Plasma layout on first login

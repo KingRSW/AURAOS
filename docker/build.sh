@@ -22,7 +22,7 @@ lb config noauto \
     --architectures amd64 \
     --binary-images iso-hybrid \
     --archive-areas "main contrib non-free non-free-firmware" \
-    --bootappend-live "boot=live components username=aura hostname=aura-os" \
+    --bootappend-live "boot=live components username=aura hostname=aura-os console=ttyS0" \
     "${@}"
 
 lb build
