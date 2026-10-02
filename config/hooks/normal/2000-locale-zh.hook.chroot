@@ -1,0 +1,13 @@
+#!/bin/bash
+# hook: 中文语言环境 + 时区。
+# 编号 2000: 必须晚于 live-build 自带的 1020-create-locales-files
+# (它会把 /etc/locale.conf 重置为 C.UTF-8), 否则中文 LANG 被覆盖。
+set -e
+grep -q "^zh_CN.UTF-8" /etc/locale.gen 2>/dev/null || echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen
+sed -i 's/^# *zh_CN.UTF-8/zh_CN.UTF-8/' /etc/locale.gen 2>/dev/null || true
+locale-gen
+echo 'LANG=zh_CN.UTF-8' > /etc/locale.conf
+echo 'LANG=zh_CN.UTF-8' > /etc/default/locale
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+echo "Asia/Shanghai" > /etc/timezone
+echo "[auraos] locale=zh_CN.UTF-8 tz=Asia/Shanghai"
