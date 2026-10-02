@@ -75,6 +75,13 @@ docker volume rm aura-lb-cache aura-build   # 彻底清缓存 (下次全量重�
    JS API + try/catch 注入。
 7. **git 连不上 github.com 443**：本机走 127.0.0.1:7897 代理，git 不读系统代理，
    需 `git -c http.proxy=http://127.0.0.1:7897 push`。
+8. **CI xorriso "Image size exceeds free space on media"**：live-build 默认把每个
+   stage 打包成 `cache/*.tar`（chroot.tar ≈ 整份未压缩 chroot），binary 阶段
+   cache + chroot + squashfs + ISO 同时落盘撑爆 runner。对策：`lb config
+   --cache false` + `hooks/9000-prune.chroot`（apt clean、删 man/info/多余 locale）。
+9. **GitHub runner 磁盘先天不足**：ubuntu-24.04 runner 预装 .NET/Android SDK/GHC
+   占 15-30GB，构建前需 `rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+   /opt/hostedtoolcache`（见 build.yml "Free disk space" step）。
 
 ## 7. 真机验证（需 x86 物理机）
 
