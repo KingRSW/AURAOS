@@ -22,12 +22,18 @@ if [ "${CLEAN:-0}" = "1" ]; then lb clean || true; fi
 rm -rf "$BUILD/config"
 cp -a /work/config "$BUILD/"
 
+# 镜像源可覆盖 (本地构建可设 MIRROR=...aliyun...; CI 默认官方源)
+MIRROR="${MIRROR:-http://deb.debian.org/debian}"
+
 lb config noauto \
     --distribution trixie \
     --architectures amd64 \
     --binary-images iso-hybrid \
     --archive-areas "main contrib non-free non-free-firmware" \
     --cache false \
+    --mirror-bootstrap "$MIRROR" \
+    --mirror-chroot "$MIRROR" \
+    --mirror-binary "$MIRROR" \
     --bootappend-live "boot=live components username=aura hostname=aura-os console=ttyS0 locales=zh_CN.UTF-8" \
     "${@}"
 
