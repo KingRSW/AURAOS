@@ -39,8 +39,8 @@ echo "[*] 轮询串口日志直至启动就绪 (上限 ${BOOT_TIMEOUT}s) ..."
 ELAPSED=0
 while [ "$ELAPSED" -lt "$BOOT_TIMEOUT" ]; do
     if grep -qi "Reached target" "$SERIAL" 2>/dev/null; then
-        echo "[+] 检测到 systemd 目标达成, 再等待桌面拉起 (180s) ..."
-        sleep 180
+        echo "[+] 检测到 systemd 目标达成, 再等待桌面拉起 (300s) ..."
+        sleep 300
         break
     fi
     sleep 15

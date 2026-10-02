@@ -28,7 +28,7 @@ lb config noauto \
     --binary-images iso-hybrid \
     --archive-areas "main contrib non-free non-free-firmware" \
     --cache false \
-    --bootappend-live "boot=live components username=aura hostname=aura-os console=ttyS0" \
+    --bootappend-live "boot=live components username=aura hostname=aura-os console=ttyS0 locales=zh_CN.UTF-8" \
     "${@}"
 
 df -h "$BUILD" || true
