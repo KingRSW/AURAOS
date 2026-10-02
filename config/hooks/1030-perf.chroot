@@ -1,0 +1,15 @@
+#!/bin/bash
+# hook: 性能调优 — zram swap + earlyoom + plymouth 静默启动
+set -e
+# zram: 默认配置即可 (zram-tools 自带 systemd 单元)
+systemctl enable zramswap 2>/dev/null || true
+systemctl enable earlyoom 2>/dev/null || true
+# plymouth 主题
+if command -v plymouth-set-default-theme >/dev/null 2>&1; then
+    plymouth-set-default-theme spinfinity 2>/dev/null || true
+    update-initramfs -u 2>/dev/null || true
+fi
+# 关闭不必要的服务降低内存占用
+for s in bluetooth avahi-daemon; do
+    systemctl disable "$s" 2>/dev/null || true
+done

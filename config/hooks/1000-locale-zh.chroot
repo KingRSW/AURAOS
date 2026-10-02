@@ -1,0 +1,8 @@
+#!/bin/bash
+# hook: 中文语言环境 + 时区
+set -e
+sed -i 's/^# *zh_CN.UTF-8/zh_CN.UTF-8/' /etc/locale.gen 2>/dev/null || true
+locale-gen
+update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+echo "Asia/Shanghai" > /etc/timezone

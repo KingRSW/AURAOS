@@ -1,0 +1,13 @@
+#!/bin/bash
+# hook: SDDM 自动登录 live 用户 aura 进入 Plasma Wayland 会话
+# live-config 在启动时按 bootappend username=aura 创建用户, 此处只写死配置。
+set -e
+mkdir -p /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/aura-autologin.conf <<'EOF'
+[Autologin]
+User=aura
+Session=plasma.desktop
+EOF
+systemctl enable sddm 2>/dev/null || true
+# live 环境禁用首启向导, 避免拖慢进入桌面
+systemctl disable gnome-initial-setup 2>/dev/null || true

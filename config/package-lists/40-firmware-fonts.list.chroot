@@ -1,0 +1,9 @@
+#!/bin/bash
+# packages: 固件 + 中文字体 + 语言环境
+firmware-linux
+firmware-misc-nonfree
+firmware-iwlwifi
+fonts-noto-cjk
+fonts-noto-color-emoji
+fonts-dejavu-core
+locales

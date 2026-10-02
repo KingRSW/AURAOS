@@ -1,0 +1,27 @@
+#!/bin/bash
+# packages: KDE Plasma 6 桌面 (macOS 观感基础)
+# 注意: trixie 中 Plasma 6 的 Wayland 会话已并入 plasma-workspace,
+#       不存在 plasma-workspace-wayland; KWin 6.3 自带 blur, 无 kwin-effects-forceblur;
+#       网络托盘包名为 plasma-nm (非 plasma-nm6)。
+plasma-desktop
+plasma-workspace
+sddm
+sddm-theme-breeze
+systemsettings
+plasma-nm
+plasma-pa
+plasma-disks
+konsole
+dolphin
+dolphin-plugins
+ark
+gwenview
+okular
+breeze
+breeze-gtk
+breeze-icons-extra
+qt6-style-kvantum
+qt6-style-kvantum-themes
+kvantum-manager
+xdg-desktop-portal-kde
+papirus-icon-theme

@@ -1,0 +1,33 @@
+name: Build AURA-OS ISO
+
+# 仓库根 = AURAOS。与本地一致: 在 debian:trixie 容器内跑 live-build,
+# 避免 Ubuntu runner 跨发行版引导导致的源配置问题。
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04   # 原生 amd64 + docker
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build builder image
+        run: docker build -t aura-builder docker/
+
+      - name: Build ISO (container, privileged for loop mounts)
+        run: |
+          docker run --rm --privileged \
+            -v "$PWD":/work -v aura-lb-cache:/var/cache/live -v aura-build:/build \
+            aura-builder bash /work/docker/build.sh
+
+      - name: Show artifact
+        run: ls -la out/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: auraos-iso
+          path: out/*.iso
+          retention-days: 14
