@@ -7,9 +7,16 @@ set -u
 LAYOUT=/usr/share/auraos/layout.js
 [ -f "$LAYOUT" ] || exit 0
 
+# Plasma 6 基于 Qt6, qdbus 可能名为 qdbus6 / qdbus-qt6
+QDBUS=""
+for c in qdbus qdbus6 qdbus-qt6; do
+    command -v "$c" >/dev/null 2>&1 && QDBUS="$c" && break
+done
+[ -n "$QDBUS" ] || exit 0
+
 # 等待 plasmashell 的 DBus 服务出现 (最多 60s)
 for i in $(seq 1 60); do
-    if qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "function(){return 1;}" >/dev/null 2>&1; then
+    if "$QDBUS" org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "function(){return 1;}" >/dev/null 2>&1; then
         break
     fi
     sleep 1
@@ -18,6 +25,6 @@ done
 # 仅在首次 (标记文件不存在) 执行, 避免每次登录重置用户自定义布局
 MARK="$HOME/.config/aura-layout.applied"
 if [ ! -f "$MARK" ]; then
-    qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$LAYOUT")" 2>/dev/null || true
+    "$QDBUS" org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$LAYOUT")" 2>/dev/null || true
     touch "$MARK"
 fi
