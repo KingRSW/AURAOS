@@ -1,0 +1,75 @@
+#!/bin/bash
+# hook: 安装 WhiteSur 主题套件 (GTK / 图标 / 光标) —— macOS 观感核心。
+# 源码 tar.gz 由 config/includes.chroot/usr/share/auraos/vendor/ 带入 chroot。
+# GTK 用 release/ 预编译包 (免 sassc 构建); 图标跑官方 install.sh (需 gtk-update-icon-cache);
+# 光标 dist/ 直接拷贝。全部 pin 在固定 commit, 可复现。
+set -euo pipefail
+
+VENDOR=/usr/share/auraos/vendor
+WORK=/tmp/whitesur-build
+rm -rf "$WORK"; mkdir -p "$WORK"
+tar xzf "$VENDOR/WhiteSur-gtk-theme-d5782652.tar.gz"    -C "$WORK"
+tar xzf "$VENDOR/WhiteSur-icon-theme-73d8040d.tar.gz"   -C "$WORK"
+tar xzf "$VENDOR/WhiteSur-cursors-e190baf6.tar.gz"      -C "$WORK"
+
+# --- GTK 主题: 解压预编译 Light/Dark 到 /usr/share/themes ---
+GTK="$WORK/WhiteSur-gtk-theme-d5782652/release"
+mkdir -p /usr/share/themes
+for v in WhiteSur-Light WhiteSur-Dark; do
+    tar xJf "$GTK/$v.tar.xz" -C /usr/share/themes/
+done
+
+# --- 图标主题: 官方脚本, -p 替换 Apple logo 为 KDE Plasma logo ---
+IC="$WORK/WhiteSur-icon-theme-73d8040d"
+( cd "$IC" && ./install.sh -p )
+
+# --- 光标: dist 直接落到 /usr/share/icons/WhiteSur-cursors ---
+CU="$WORK/WhiteSur-cursors-e190baf6"
+rm -rf /usr/share/icons/WhiteSur-cursors
+cp -pr "$CU/dist" /usr/share/icons/WhiteSur-cursors
+
+# 系统默认光标主题 (X11 x-cursor-theme 备选 + default/index.theme)
+mkdir -p /usr/share/icons/default
+cat > /usr/share/icons/default/index.theme <<'EOF'
+[Icon Theme]
+Name=Default
+Comment=Default Cursor Theme
+Inherits=WhiteSur-cursors
+EOF
+
+# --- /etc/skel 用户默认: GTK 主题 + 光标 (Plasma 6 读 kcminputrc/kdeglobals) ---
+CFG=/etc/skel/.config
+mkdir -p "$CFG" "$CFG/gtk-3.0" "$CFG/gtk-4.0"
+
+cat > "$CFG/gtk-3.0/settings.ini" <<'EOF'
+[Settings]
+gtk-theme-name=WhiteSur-Dark
+gtk-icon-theme-name=WhiteSur-dark
+gtk-cursor-theme-name=WhiteSur-cursors
+gtk-cursor-theme-size=24
+gtk-font-name=Sans Serif 10
+EOF
+cp "$CFG/gtk-3.0/settings.ini" "$CFG/gtk-4.0/settings.ini"
+
+mkdir -p "$CFG/gtk-2.0"
+cat > "$CFG/gtk-2.0/gtkrc-2.0" <<'EOF'
+gtk-theme-name = "WhiteSur-Dark"
+gtk-icon-theme-name = "WhiteSur-dark"
+gtk-cursor-theme-name = "WhiteSur-cursors"
+EOF
+
+# Plasma: 光标主题 + GTK 主题观感
+cat > "$CFG/kcminputrc" <<'EOF'
+[Mouse]
+cursorTheme=WhiteSur-cursors
+EOF
+
+cat >> "$CFG/kdeglobals" <<'EOF'
+
+[Icons]
+Theme=WhiteSur-dark
+EOF
+
+# 清理构建残留 (vendor 源码保留在 /usr/share/auraos, 体积可接受)
+rm -rf "$WORK"
+echo "[auraos] WhiteSur 主题安装完成"
