@@ -10,6 +10,7 @@ cat > "$CFG/kwinrc" <<'EOF'
 [Compositing]
 Enabled=true
 OpenGLIsUnsafe=false
+LatencyPolicy=LatencyLow
 
 [Effect-Blur]
 BlurEnabled=true
@@ -38,7 +39,7 @@ Fixed=Monospace,11
 Font=Sans Serif,10,-1,5,50,0,0,0,0,0
 
 [KDE]
-AnimationDuration=120
+AnimationDurationFactor=0.5
 SingleClick=false
 
 [WM]

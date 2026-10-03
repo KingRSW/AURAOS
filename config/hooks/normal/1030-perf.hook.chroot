@@ -13,3 +13,25 @@ fi
 for s in bluetooth avahi-daemon; do
     systemctl disable "$s" 2>/dev/null || true
 done
+
+# --- 桌面流畅度: zram 用 zstd + 50% 内存 ---
+cat > /etc/default/zramswap <<'EOF'
+ALGO=zstd
+PERCENT=50
+EOF
+
+# --- 内核参数: zram 场景高 swappiness (Fedora 同款), dentry/inode 缓存多保留 ---
+cat > /etc/sysctl.d/90-auraos-desktop.conf <<'EOF'
+vm.swappiness=180
+vm.vfs_cache_pressure=50
+EOF
+
+# --- 关闭 baloo 全文索引 (live 系统首启 CPU/IO 大户, 桌面观感无关) ---
+BALOO=/etc/xdg/autostart/baloo_file.desktop
+[ -f "$BALOO" ] && { echo "Hidden=true" >> "$BALOO"; }
+
+# --- 关闭其它非必要自启动项 (存在才改) ---
+for f in org.kde.discovernotifier org.kde.kdeconnect.daemon; do
+    A="/etc/xdg/autostart/$f.desktop"
+    [ -f "$A" ] && { echo "Hidden=true" >> "$A"; }
+done
