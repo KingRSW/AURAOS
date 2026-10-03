@@ -36,9 +36,16 @@ jobs:
           ls -la
           cat SHA256SUMS.txt
 
+      - name: Split ISO (release asset limit 2GiB)
+        run: |
+          cd out
+          split -b 1400m -d --additional-suffix=.part *.iso auraos-1.0-amd64.iso.
+          ls -la
+
       - name: Create release
         run: |
-          gh release create -R "$GITHUB_REPOSITORY" "$TAG" out/*.iso out/SHA256SUMS.txt \
+          gh release create -R "$GITHUB_REPOSITORY" "$TAG" \
+            out/auraos-1.0-amd64.iso.part-* out/SHA256SUMS.txt \
             --title "AURA-OS $TAG" --notes "$NOTES"
         env:
           GH_TOKEN: ${{ github.token }}
