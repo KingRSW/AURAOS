@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Download ISO artifact
-        run: gh run download "$RUN_ID" -n auraos-iso -D out
+        run: gh run download -R "$GITHUB_REPOSITORY" "$RUN_ID" -n auraos-iso -D out
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ inputs.run_id }}
@@ -37,7 +37,7 @@ jobs:
 
       - name: Create release
         run: |
-          gh release create "$TAG" out/*.iso out/SHA256SUMS.txt \
+          gh release create -R "$GITHUB_REPOSITORY" "$TAG" out/*.iso out/SHA256SUMS.txt \
             --title "AURA-OS $TAG" --notes "$NOTES"
         env:
           GH_TOKEN: ${{ github.token }}
