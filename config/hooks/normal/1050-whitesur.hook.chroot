@@ -19,9 +19,9 @@ for v in WhiteSur-Light WhiteSur-Dark; do
     tar xJf "$GTK/$v.tar.xz" -C /usr/share/themes/
 done
 
-# --- 图标主题: 官方脚本, -p 替换 Apple logo 为 KDE Plasma logo ---
+# --- 图标主题: 官方脚本, 默认保留 Apple logo (macOS 观感核心; -p 会换成 KDE logo) ---
 IC="$WORK/WhiteSur-icon-theme-73d8040d"
-( cd "$IC" && ./install.sh -p )
+( cd "$IC" && ./install.sh )
 
 # --- 光标: dist 直接落到 /usr/share/icons/WhiteSur-cursors ---
 CU="$WORK/WhiteSur-cursors-e190baf6"
