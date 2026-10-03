@@ -1,35 +1,43 @@
-# AURA-OS 构建入口
-# make iso   = 构建可引导 ISO (需 Docker Desktop 运行; Apple Silicon 需注册 amd64 模拟)
-# make run   = QEMU GUI 启动
-# make test  = 无头自动化测试 (VNC 截图)
-# make clean = 清理产物
+# AURA-OS v2 — pure NASM x86-64 kernel, no OS underneath.
+# Image layout: LBA0 MBR | LBA1..32 stage2 | LBA64.. kernel
 
-ISO     := out/auraos-1.0-amd64.iso
-BUILDER := aura-builder
-CACHE   := aura-lb-cache
-BUILDV  := aura-build
+NASM   ?= nasm
+PYTHON ?= python3
+QEMU   ?= qemu-system-x86_64
+BUILD  := build
+IMG    := out/auraos.img
 
-.PHONY: all iso docker run test clean
+.PHONY: all run smoke clean font
 
-all: iso
+all: $(IMG)
 
-docker:
-	docker build --platform linux/amd64 -t $(BUILDER) docker/
+$(BUILD) out:
+	mkdir -p $@
 
-iso: docker
-	docker run --rm --privileged --platform linux/amd64 \
-		-v "$(CURDIR)":/work -v $(CACHE):/var/cache/live -v $(BUILDV):/build \
-		$(BUILDER) bash /work/docker/build.sh
+$(BUILD)/mbr.bin: boot/mbr.asm | $(BUILD)
+	$(NASM) -f bin $< -o $@
 
-run: $(ISO)
-	qemu-system-x86_64 -m 4G -smp 2 -cdrom $(ISO) -boot d -display cocoa
+$(BUILD)/stage2.bin: boot/stage2.asm | $(BUILD)
+	$(NASM) -f bin $< -o $@
 
-test: $(ISO)
-	bash tests/qemu-boot.sh
+$(BUILD)/kernel.bin: kernel/main.asm $(wildcard kernel/*.asm kernel/*.inc) | $(BUILD)
+	$(NASM) -f bin -I kernel/ $< -o $@
+	$(PYTHON) scripts/patch_size.py $@
 
-$(ISO):
-	@echo "ISO 不存在, 先运行: make iso" && false
+$(IMG): $(BUILD)/mbr.bin $(BUILD)/stage2.bin $(BUILD)/kernel.bin | out
+	truncate -s 2048K $@
+	dd if=$(BUILD)/mbr.bin    of=$@ bs=512 seek=0  conv=notrunc
+	dd if=$(BUILD)/stage2.bin of=$@ bs=512 seek=1  conv=notrunc
+	dd if=$(BUILD)/kernel.bin of=$@ bs=512 seek=64 conv=notrunc
+
+run: $(IMG)
+	$(QEMU) -drive format=raw,file=$(IMG) -m 512
+
+smoke: $(IMG)
+	tests/smoke.sh $(IMG)
+
+font:
+	$(PYTHON) scripts/genfont.py kernel/font.inc
 
 clean:
-	rm -rf out 2>/dev/null || true
-	docker run --rm --privileged -v "$(CURDIR)":/work -v $(BUILDV):/build $(BUILDER) bash -c 'cd /build && lb clean --all || true'
+	rm -rf $(BUILD) out/auraos.img

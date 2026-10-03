@@ -1,7 +1,7 @@
-name: Build AURA-OS ISO
+name: Build AURA-OS
 
-# 仓库根 = AURAOS。与本地一致: 在 debian:trixie 容器内跑 live-build,
-# 避免 Ubuntu runner 跨发行版引导导致的源配置问题。
+# Pure-NASM kernel: assemble flat-binary image, then boot it headless in QEMU
+# and assert the "[aura] ready" serial marker (tests/smoke.sh).
 on:
   push:
     branches: [main, master]
@@ -9,33 +9,27 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04   # 原生 amd64 + docker
-    timeout-minutes: 240
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Free disk space
-        # ISO 约 2.5GB, 构建峰值需 ~20GB; runner 预装的 Android SDK/.NET/GHC
-        # 占用 15-30GB, 不删除会导致 xorriso 写盘时 "exceeds free space on media"。
+      - name: Install toolchain
         run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
-          sudo docker system prune -af
-          df -h / /mnt
+          sudo apt-get update
+          sudo apt-get install -y nasm qemu-system-x86 python3-pil
 
-      - name: Build builder image
-        run: docker build -t aura-builder docker/
+      - name: Build image
+        run: make
 
-      - name: Build ISO (container, privileged for loop mounts)
-        run: |
-          docker run --rm --privileged \
-            -v "$PWD":/work -v aura-lb-cache:/var/cache/live -v aura-build:/build \
-            aura-builder bash /work/docker/build.sh
+      - name: Smoke test (headless QEMU)
+        run: make smoke
 
-      - name: Show artifact
+      - name: Show artifacts
         run: ls -la out/
 
       - uses: actions/upload-artifact@v4
         with:
-          name: auraos-iso
-          path: out/*.iso
+          name: auraos-img
+          path: out/auraos.img
           retention-days: 14

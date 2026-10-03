@@ -1,6 +1,0 @@
-#!/bin/bash
-# packages: 性能与启动体验
-zram-tools
-earlyoom
-plymouth
-plymouth-themes

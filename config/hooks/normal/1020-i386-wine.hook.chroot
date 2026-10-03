@@ -1,9 +1,0 @@
-#!/bin/bash
-# hook: 启用 i386 multiarch 并安装 wine32 (32 位 Windows 应用兼容)
-# 失败不阻断构建 (镜像源缺 i386 时降级为仅 wine64)。
-set -e
-dpkg --add-architecture i386
-if apt-get update -qq; then
-    apt-get install -y --no-install-recommends wine32:i386 || \
-        echo "WARN: wine32:i386 安装失败, 仅保留 wine64"
-fi

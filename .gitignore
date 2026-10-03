@@ -1,24 +1,9 @@
+# build outputs
+build/
 out/
-chroot*/
-binary*/
-archive*/
-boot*/
-.cache*/
-live-image*/
 *.iso
-*.gz
-*.sha1
-*.md5
-*.sig
-# live-build 在 config/ 下生成的文件 (非源码)
-config/archives
-config/bootstrap
-config/binary
-config/binary_*
-config/chroot
-config/common
-config/control
-config/source
-config/*apt*
-# macOS Finder 元数据
+*.img
+# python
+__pycache__/
+# macOS
 .DS_Store
