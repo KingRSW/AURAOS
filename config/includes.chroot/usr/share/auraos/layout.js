@@ -24,7 +24,7 @@ safe(function () {
     top.lengthMode = "fill";
     top.hiding = "none";
 
-    // 左: 系统启动器 (WhiteSur 图标主题下呈现 Apple 风格 logo)
+    // 左: 系统启动器 (Plasma logo, WhiteSur -p 替换后 start-here-kde 即 Plasma logo)
     safe(function () {
         var kickoff = top.addWidget("org.kde.plasma.kickoff");
         kickoff.currentConfigGroup = ["General"];
