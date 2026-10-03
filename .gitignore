@@ -20,3 +20,5 @@ config/common
 config/control
 config/source
 config/*apt*
+# macOS Finder 元数据
+.DS_Store
