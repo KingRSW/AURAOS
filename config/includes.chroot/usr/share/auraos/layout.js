@@ -52,6 +52,16 @@ safe(function () {
     safe(function () { top.addWidget("org.kde.plasma.systemtray"); });
 });
 
+// ===== 桌面壁纸 (AuraOS 极光渐变, org.kde.image) =====
+safe(function () {
+    var ds = desktops();
+    for (var i = 0; i < ds.length; i++) {
+        ds[i].wallpaperPlugin = "org.kde.image";
+        ds[i].currentConfigGroup = ["Wallpaper", "org.kde.image", "General"];
+        ds[i].writeConfig("Image", "file:///usr/share/wallpapers/AuraOS/contents/images/1920x1080.jpg");
+    }
+});
+
 // ===== 底部 Dock (dodgewindows: 仅被全屏/最大化窗口遮挡时让位) =====
 safe(function () {
     var dock = new Panel();

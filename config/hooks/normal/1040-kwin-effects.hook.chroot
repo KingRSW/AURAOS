@@ -25,33 +25,38 @@ overviewEnabled=true
 highlightwindowEnabled=true
 
 [org.kde.kdecoration2]
-library=org.kde.breeze
+library=org.kde.aurorae
+theme=WhiteSur-dark
 BorderSize=Medium
-ButtonsOnLeft=
-ButtonsOnRight=H,M,X
+ButtonsOnLeft=X,M,H
+ButtonsOnRight=
 EOF
 
-# --- kdeglobals: 全局观感 (半透明/动画时长) ---
+# --- kdeglobals: 全局观感 (WhiteSurDark 配色 / Kvantum / Noto Sans CJK 字体) ---
 cat > "$CFG/kdeglobals" <<'EOF'
 [General]
-ColorScheme=Breeze
-Fixed=Monospace,11
-Font=Sans Serif,10,-1,5,50,0,0,0,0,0
+ColorScheme=WhiteSurDark
+Fixed=Noto Sans Mono CJK SC,10,-1,5,50,0,0,0,0,0
+Font=Noto Sans CJK SC,10,-1,5,50,0,0,0,0,0
+menuFont=Noto Sans CJK SC,10,-1,5,50,0,0,0,0,0
+toolBarFont=Noto Sans CJK SC,10,-1,5,50,0,0,0,0,0
+smallestReadableFont=Noto Sans CJK SC,8,-1,5,50,0,0,0,0,0
 
 [KDE]
 AnimationDurationFactor=0.5
 SingleClick=false
+widgetStyle=kvantum
 
 [WM]
 useCompositing=true
 EOF
 
-# --- kvantum: 用 WhiteSur-ish 半透明风格 (若主题缺失则默认) ---
+# --- kvantum: WhiteSurDark (系统级 /usr/share/Kvantum, 1050 hook 安装) ---
 KVA=/etc/skel/.config/Kvantum
 mkdir -p "$KVA"
 cat > "$KVA/kvantumrc" <<'EOF'
 [General]
-CurrentTheme=WhiteSur-dark
+CurrentTheme=WhiteSurDark
 EOF
 
 # --- kcmfonts: 关闭字体 DPI 自动缩放 (QEMU 下更稳) ---

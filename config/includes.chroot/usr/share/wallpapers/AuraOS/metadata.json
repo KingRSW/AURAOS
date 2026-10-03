@@ -1,0 +1,12 @@
+{
+    "KPlugin": {
+        "Id": "AuraOS",
+        "Name": "AURA-OS",
+        "License": "CC0-1.0",
+        "Authors": [
+            {
+                "Name": "AURA-OS Project"
+            }
+        ]
+    }
+}
